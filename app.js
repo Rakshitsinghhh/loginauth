@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt")
 const { UserModel, TodoModel } = require("./db");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET="s3cret";
+const {z} = require("zod")
 
 
 const app = express();
@@ -28,11 +29,28 @@ const auth = (req, res, next) => {
 };
 
 app.post("/signup", async function(req, res) {
+
+    const requiredbody = z.object({
+        email: z.string().min(3).max(100).email(),
+        name: z.string().min(3).max(100),
+        password: z.string().min(6).max(100)
+    });
+
+    const parsewithsuccess = requiredbody.safeParse(req.body);
+
+    if (!parsewithsuccess.success) {
+        res.status(404).json({
+            message: "enter accurate Data",
+            error: parsewithsuccess.error
+        });
+        return;
+    }
+
     const email = req.body.email;
     const password = req.body.password;
     const name = req.body.name;
 
-    const hashedpass = await bcrypt.hash(password,5)
+    const hashedpass = await bcrypt.hash(password, 5);
 
     await UserModel.create({
         email: email,
@@ -42,9 +60,10 @@ app.post("/signup", async function(req, res) {
     
     res.json({
         message: "You are signed up",
-        hassedpas: hashedpass
-    })
+        // hassedpas: hashedpass
+    });
 });
+
 app.post("/signin", async function(req, res) {
     const email = req.body.email;
     const pass = req.body.password;
@@ -110,6 +129,6 @@ app.post("/todos", auth, async function(req, res) {
     }
 });
 
-app.listen(3006,()=>{
+app.listen(3007,()=>{
     console.log("running...")
 });
