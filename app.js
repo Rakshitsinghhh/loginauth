@@ -9,7 +9,7 @@ const app = express();
 app.use(express.json());
 
 const mongoose = require("mongoose");
-mongoose.connect("mongodb+srv://admin:9E03m4kEjqurgOWS@tester.xjjxqm1.mongodb.net/?appName=tester")
+mongoose.connect("mongodb+srv://admin:@tester.xjjxqm1.mongodb.net/?appName=tester")
 
 const auth = (req, res, next) => {
     const token = req.headers.authorization;
